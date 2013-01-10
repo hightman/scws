@@ -8,10 +8,10 @@ if (substr($_SERVER['REQUEST_URI'], -4) === 'scws')
 //
 // load version from down files automatically
 $version = false;
-$files = glob("down/scws-*.tar.bz2");
+$files = glob(dirname(__FILE__) . "/down/scws-*.tar.bz2");
 foreach ($files as $file)
 {
-	$pos1 = strpos($file, '-') + 1;
+	$pos1 = strpos($file, 'scws-') + 5;
 	$pos2 = strpos($file, '.tar');
 	$ver = substr($file, $pos1, $pos2 - $pos1);
 	if (!$version || version_compare($ver, $version) > 0)
