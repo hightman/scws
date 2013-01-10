@@ -20,6 +20,10 @@ dist-dict:
 dist-hook:
 	-rm -f $(distdir)/libscws/version.h
 
+sync-web:
+	unison ./web ssh://xunsearch/web/scws $(UNISON_OPT)
+
 dist-web: dist-bzip2
 	mv -f $(distdir).tar.bz2 web/down
-	unison ./web ssh://xunsearch/web/scws $(UNISON_OPT)
+	make sync-web
+
