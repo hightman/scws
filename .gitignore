@@ -2,6 +2,8 @@
 *.tar.bz2
 *.zip
 *.xdb
+*.tgz
+*.dll
 
 # Others
 

@@ -8,6 +8,8 @@ SUBDIRS = . libscws cli etc
 DIST_SUBDIRS = libscws cli etc
 
 EXTRA_DIST = API.md README.md phpext win32
+
+UNISON_OPT = -auto -batch -prefer newer -terse -times
 	
 dict:
 	cd etc && make dict
@@ -18,3 +20,6 @@ dist-dict:
 dist-hook:
 	-rm -f $(distdir)/libscws/version.h
 
+dist-web: dist-bzip2
+	mv -f $(distdir).tar.bz2 web/down
+	unison ./web ssh://xunsearch/web/scws $(UNISON_OPT)
