@@ -2,6 +2,7 @@
 // forced to with / trail end
 if (substr($_SERVER['REQUEST_URI'], -4) === 'scws')
 {
+	header('HTTP/1.1 301 Moved Permanently');
 	header("Location: " . $_SERVER['REQUEST_URI'] . '/');
 	exit(0);
 }
