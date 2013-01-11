@@ -49,12 +49,16 @@ typedef struct scws_xdict
 {
 	void *xdict;
 	int xmode;
+	int ref;	// hightman.20130110: refcount (zero to really free/close)
 	struct scws_xdict *next;
 }	xdict_st, *xdict_t;
 
 /* pub function (api) */
 xdict_t xdict_open(const char *fpath, int mode);
 void xdict_close(xdict_t xd);
+
+/* fork xdict */
+xdict_t xdict_fork(xdict_t xd);
 
 /* add a new dict file into xd, succ: 0, error: -1, Mblen only used for XDICT_TXT */
 xdict_t xdict_add(xdict_t xd, const char *fpath, int mode, unsigned char *ml);

@@ -54,12 +54,16 @@ typedef struct scws_rule
 	xtree_t tree;
 	rule_attr_t attr;
 	struct scws_rule_item items[SCWS_RULE_MAX];
+	int ref;	// hightman.20130110: refcount (zero to really free/close)
 }	rule_st, *rule_t;
 
 /* scws ruleset: api */
 
 /* create & load ruleset, by fpath & charset */
 rule_t scws_rule_new(const char *fpath, unsigned char *mblen);
+
+/* fork ruleset */
+rule_t scws_rule_fork(rule_t r);
 
 /* free the memory & resource for ruleset */
 void scws_rule_free(rule_t r);

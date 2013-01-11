@@ -6,11 +6,11 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#    include "config.h"
 #endif
 
 #ifdef WIN32
-#	include "config_win32.h"
+#    include "config_win32.h"
 #endif
 
 #include "xdict.h"
@@ -21,21 +21,22 @@
 #include <stdlib.h>
 #include <string.h>
 #ifndef WIN32
-#  include <sys/param.h>
+#    include <sys/param.h>
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
 
 /* temp file format for TEXT xdb */
 #if !defined(PATH_MAX) || (PATH_MAX < 1024)
-#  define	XDICT_PATH_MAX	1024
+#    define	XDICT_PATH_MAX	1024
 #else
-#  define	XDICT_PATH_MAX	PATH_MAX
+#    define	XDICT_PATH_MAX	PATH_MAX
 #endif
 
 #ifdef HAVE_STRTOK_R
-#  define	_strtok_r	strtok_r
-#  else
+#    define	_strtok_r	strtok_r
+#else
+
 static char *_strtok_r(char *s, char *delim, char **lasts)
 {
 	register char *spanp;
@@ -50,13 +51,13 @@ static char *_strtok_r(char *s, char *delim, char **lasts)
 	 */
 cont:
 	c = *s++;
-	for (spanp = (char *)delim; (sc = *spanp++) != 0; )
+	for (spanp = (char *) delim; (sc = *spanp++) != 0;)
 	{
 		if (c == sc) goto cont;
 	}
 
 	if (c == 0)
-	{	/* no non-delimiter characters */
+	{ /* no non-delimiter characters */
 		*lasts = NULL;
 		return NULL;
 	}
@@ -66,25 +67,28 @@ cont:
 	 * Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
 	 * Note that delim must have one NUL; we stop if we see that, too.
 	 */
-	for (; ;)
+	for (;;)
 	{
 		c = *s++;
-		spanp = (char *)delim;
-		do {
-			if ((sc = *spanp++) == c) 
+		spanp = (char *) delim;
+		do
+		{
+			if ((sc = *spanp++) == c)
 			{
 				if (c == 0) s = NULL;
 				else s[-1] = '\0';
 				*lasts = s;
 				return tok;
 			}
-		} while (sc != 0);
+		}
+		while (sc != 0);
 	}
 }
 #endif
 
 #ifdef WIN32
-#  include <direct.h>
+#    include <direct.h>
+
 static void _realpath(const char *src, char *dst)
 {
 	int len = strlen(src);
@@ -100,7 +104,7 @@ static void _realpath(const char *src, char *dst)
 	}
 }
 #else
-#  define	_realpath	realpath
+#    define	_realpath	realpath
 #endif
 
 /* open the text dict */
@@ -115,14 +119,14 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 	_realpath(fpath, buf);
 	if (stat(buf, &st1) < 0)
 		return NULL;
-	
+
 	// check dest file & orginal file, compare there mtime
 #ifdef WIN32
 	{
 		char *tmp_ptr;
 		GetTempPath(sizeof(tmpfile) - 20, tmpfile);
 		tmp_ptr = tmpfile + strlen(tmpfile);
-		if (tmp_ptr[-1] == '\\') tmp_ptr--;		
+		if (tmp_ptr[-1] == '\\') tmp_ptr--;
 		sprintf(tmp_ptr, "\\scws-%08x.xdb", scws_crc32(buf));
 	}
 #else
@@ -130,12 +134,12 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 #endif
 	if (!stat(tmpfile, &st2) && st2.st_mtime > st1.st_mtime)
 	{
-		xdb_t x;		
+		xdb_t x;
 		if ((x = xdb_open(tmpfile, 'r')) != NULL)
 		{
 			xd = (xdict_t) malloc(sizeof(xdict_st));
 			memset(xd, 0, sizeof(xdict_st));
-			
+
 			if (mode & SCWS_XDICT_MEM)
 			{
 				/* convert the xdb(disk) -> xtree(memory) */
@@ -148,7 +152,7 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 				}
 			}
 			xd->xmode = SCWS_XDICT_XDB;
-			xd->xdict = (void *) x;	
+			xd->xdict = (void *) x;
 			return xd;
 		}
 	}
@@ -166,10 +170,10 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 		// re-build the xdb file from text file	
 		if ((fp = fopen(buf, "r")) == NULL)
 			return NULL;
-		
+
 		// parse every line
 		word.attr[2] = '\0';
-		while (fgets(buf, sizeof(buf)-1, fp) != NULL)
+		while (fgets(buf, sizeof(buf) - 1, fp) != NULL)
 		{
 			// <word>[\t<tf>[\t<idf>[\t<attr>]]]		
 			if (buf[0] == ';' || buf[0] == '#') continue;
@@ -180,7 +184,7 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 
 			// init the word
 			do
-			{				
+			{
 				word.tf = word.idf = 1.0;
 				word.flag = SCWS_WORD_FULL;
 				word.attr[0] = '@';
@@ -197,7 +201,8 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 					word.attr[0] = part[0];
 					if (part[1]) word.attr[1] = part[1];
 				}
-			} while (0);
+			}
+			while (0);
 
 			// save into xtree
 			if ((w = xtree_nget(xt, key, kl, NULL)) == NULL)
@@ -215,24 +220,24 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 			}
 
 			// parse the part	
-			cl = ml[(unsigned char)(key[0])];
+			cl = ml[(unsigned char) (key[0])];
 			while (1)
 			{
-				cl += ml[(unsigned char)(key[cl])];
+				cl += ml[(unsigned char) (key[cl])];
 				if (cl >= kl) break;
-				
+
 				if ((w = xtree_nget(xt, key, cl, NULL)) != NULL)
 					w->flag |= SCWS_WORD_PART;
 				else
 				{
 					w = (word_st *) pmalloc_z(xt->p, sizeof(word_st));
 					w->flag = SCWS_WORD_PART;
-					xtree_nput(xt, w, sizeof(word), key, cl);				
+					xtree_nput(xt, w, sizeof(word), key, cl);
 				}
 			}
 		}
 		fclose(fp);
-		
+
 		// optimize the xtree & save to xdb
 		xtree_optimize(xt);
 		unlink(tmpfile);
@@ -242,6 +247,7 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 		// return xtree
 		xd = (xdict_t) malloc(sizeof(xdict_st));
 		memset(xd, 0, sizeof(xdict_st));
+		xd->ref = 1;
 		xd->xdict = (void *) xt;
 		xd->xmode = SCWS_XDICT_MEM;
 		return xd;
@@ -253,12 +259,13 @@ xdict_t xdict_open(const char *fpath, int mode)
 {
 	xdict_t xd;
 	xdb_t x;
-	
+
 	if (!(x = xdb_open(fpath, 'r')))
 		return NULL;
 
 	xd = (xdict_t) malloc(sizeof(xdict_st));
-	memset(xd, 0, sizeof(xdict_st));	
+	memset(xd, 0, sizeof(xdict_st));
+	xd->ref = 1;
 	if (mode & SCWS_XDICT_MEM)
 	{
 		xtree_t xt;
@@ -272,9 +279,9 @@ xdict_t xdict_open(const char *fpath, int mode)
 			return xd;
 		}
 	}
-	
+
 	xd->xmode = SCWS_XDICT_XDB;
-	xd->xdict = (void *) x;	
+	xd->xdict = (void *) x;
 	return xd;
 }
 
@@ -282,7 +289,7 @@ xdict_t xdict_open(const char *fpath, int mode)
 xdict_t xdict_add(xdict_t xd, const char *fpath, int mode, unsigned char *ml)
 {
 	xdict_t xx;
-	
+
 	xx = (mode & SCWS_XDICT_TXT ? _xdict_open_txt(fpath, mode, ml) : xdict_open(fpath, mode));
 	if (xx != NULL)
 	{
@@ -292,20 +299,36 @@ xdict_t xdict_add(xdict_t xd, const char *fpath, int mode, unsigned char *ml)
 	return xd;
 }
 
+/* fork the dict */
+xdict_t xdict_fork(xdict_t xd)
+{
+	xdict_t xx;
+	for (xx = xd; xx != NULL; xx = xx->next)
+	{
+		xx->ref++;
+	}
+	return xd;
+}
+
 /* close the dict */
 void xdict_close(xdict_t xd)
 {
 	xdict_t xx;
+
 	while ((xx = xd) != NULL)
 	{
-		if (xd->xmode == SCWS_XDICT_MEM)
-			xtree_free((xtree_t) xd->xdict);
-		else
-		{
-			xdb_close((xdb_t) xd->xdict);
-		}
 		xd = xx->next;
-		free(xx);
+		xx->ref--;
+		if (xx->ref == 0)
+		{
+			if (xx->xmode == SCWS_XDICT_MEM)
+				xtree_free((xtree_t) xx->xdict);
+			else
+			{
+				xdb_close((xdb_t) xx->xdict);
+			}
+			free(xx);
+		}
 	}
 }
 
@@ -341,7 +364,7 @@ word_t xdict_query(xdict_t xd, const char *key, int len)
 			if (value2 == NULL)
 			{
 				if (_FLAG_BOTH(value))
-					return value;				
+					return value;
 				value2 = value;
 			}
 			else

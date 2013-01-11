@@ -67,35 +67,33 @@ scws_t scws_new()
 /* hightman.110320: fork scws */
 scws_t scws_fork(scws_t p)
 {
-	if (p == NULL)
-		return scws_new();
-	else
-	{
-		scws_t s;
-		s = (scws_t) malloc(sizeof(scws_st));
-        if (s == NULL)
-            return s;
-		memset(s, 0, sizeof(scws_st));
-		s->p = p->p == NULL ? p : p->p;
-		s->mblen = s->p->mblen;
-		s->mode = s->p->mode;
-		s->wend = -1;
+	scws_t s = scws_new();
 
-		return s;
+	if (p != NULL && s != NULL)
+	{
+		s->mblen = p->mblen;
+		s->mode = p->mode;
+		// fork dict/rules
+		s->r = scws_rule_fork(p->r);
+		s->d = xdict_fork(p->d);
 	}
+
+	return s;
 }
 
 /* close & free the engine */
 void scws_free(scws_t s)
 {
-	if (s->p == NULL)
+	if (s->d)
 	{
-		if (s->d)
-			xdict_close(s->d);
-		if (s->r)
-			scws_rule_free(s->r);
+		xdict_close(s->d);
+		s->d = NULL;
 	}
-
+	if (s->r)
+	{
+		scws_rule_free(s->r);
+		s->r = NULL;
+	}
 	free(s);
 }
 
@@ -103,8 +101,6 @@ void scws_free(scws_t s)
 int scws_add_dict(scws_t s, const char *fpath, int mode)
 {
 	xdict_t xx;
-	if (s->p != NULL)
-		s = s->p;
 	if (mode & SCWS_XDICT_SET)
 	{
 		xdict_close(s->d);
@@ -129,8 +125,6 @@ void scws_set_charset(scws_t s, const char *cs)
 
 void scws_set_rule(scws_t s, const char *fpath)
 {
-	if (s->p != NULL)
-		s = s->p;
 	if (s->r != NULL)
 		scws_rule_free(s->r);
 
@@ -179,11 +173,6 @@ void scws_send_text(scws_t s, const char *text, int len)
 	s->txt = (unsigned char *) text;
 	s->len = len;
 	s->off = 0;
-	if (s->p != NULL)
-	{
-		s->d = s->p->d;
-		s->r = s->p->r;
-	}
 }
 
 /* get some words, if these is not words, return NULL */

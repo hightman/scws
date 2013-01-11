@@ -37,6 +37,7 @@ extern "C" {
 
 /* data structures */
 typedef struct scws_result *scws_res_t;
+
 struct scws_result
 {
 	int off;
@@ -47,6 +48,7 @@ struct scws_result
 };
 
 typedef struct scws_topword *scws_top_t;
+
 struct scws_topword
 {
 	char *word;
@@ -62,11 +64,10 @@ struct scws_zchar
 	int end;
 };
 
-typedef struct scws_st scws_st, *scws_t;  
+typedef struct scws_st scws_st, *scws_t;
+
 struct scws_st
 {
-	/* hightman.110320: fork mode, share dictionary/rule with another */
-	scws_t p;
 	xdict_t d;
 	rule_t r;
 	unsigned char *mblen;
@@ -83,7 +84,7 @@ struct scws_st
 };
 
 /* api: init the scws handler */
-scws_t scws_new();	
+scws_t scws_new();
 void scws_free(scws_t s);
 /* fork instance for multi-threaded usage, but they shared the dict/rules */
 scws_t scws_fork(scws_t s);
