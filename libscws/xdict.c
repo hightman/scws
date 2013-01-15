@@ -139,6 +139,7 @@ static xdict_t _xdict_open_txt(const char *fpath, int mode, unsigned char *ml)
 		{
 			xd = (xdict_t) malloc(sizeof(xdict_st));
 			memset(xd, 0, sizeof(xdict_st));
+			xd->ref = 1;
 
 			if (mode & SCWS_XDICT_MEM)
 			{
