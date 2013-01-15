@@ -18,7 +18,7 @@ dist-dict:
 	cd etc && make dist-dict
 
 dist-hook:
-	-rm -f $(distdir)/libscws/version.h
+#	-rm -f $(distdir)/libscws/version.h
 
 sync-web:
 	unison ./web ssh://xunsearch/web/scws $(UNISON_OPT)

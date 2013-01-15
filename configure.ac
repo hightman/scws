@@ -3,7 +3,7 @@
 # scws-1.x.x configure - modified by hightman
 
 AC_PREREQ([2.68])
-AC_INIT([scws], [1.2.1-dev], [http://www.xunsearch.com/scws])
+AC_INIT([scws], [1.2.1], [http://www.xunsearch.com/scws])
 
 # init automake
 AM_INIT_AUTOMAKE

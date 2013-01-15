@@ -30,6 +30,12 @@
 			<a href="http://www.xunsearch.com" target="_blank">xunsearch（迅搜）</a>发布，是非常好用的 php 全文解决方案！
 		</li>
 		<li class="important">
+		<dt>2013-1-15: SCWS-1.2.1 Released.</dt>
+		<dd>1) 将源码迁移并托管到 <a href="https://github.com/hightman/scws" target="_blank">github</a></dd>
+		<dd>2) 改进 C API 中 scws_fork() 的算法，使之更为合理</dd>		 
+		<dd>3) 迁移并修改新版官方主页：<a href="http://www.xunsearch.com/scws/">http://www.xunsearch.com/scws</a></dd>
+		</li>
+		<li>
 		<dt>2012-3-29: SCWS-1.2.0 Released.</dt>
 		<dd>1) 修改 php 扩展代码以兼容支持 php 5.4.x </dd>
 		<dd>2) 修正 php 扩展中 scws_get_tops 的 limit 参数不允许少于 10 的问题</dd>		 
