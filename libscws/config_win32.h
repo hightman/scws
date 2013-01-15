@@ -8,7 +8,7 @@
 #	define inline   __inline
 #endif
 
-#define strcasecmp(s1, s2) stricmp(s1, s2)
+#define strcasecmp(s1, s2) _stricmp(s1, s2)
 #define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
 
 #ifndef S_ISREG 
