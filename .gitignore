@@ -30,4 +30,5 @@ ltmain.sh
 cli/scws
 cli/scws-gen-dict
 libscws/version.h
+web/demo/a.php
 

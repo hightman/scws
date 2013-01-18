@@ -7,7 +7,7 @@ SUBDIRS = . libscws cli etc
 
 DIST_SUBDIRS = libscws cli etc
 
-EXTRA_DIST = API.md README.md phpext win32
+EXTRA_DIST = API.md phpext win32
 
 UNISON_OPT = -auto -batch -prefer newer -terse -times
 	
