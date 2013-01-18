@@ -35,7 +35,6 @@ AC_SUBST(LIBTOOL)
 # libtool compile
 SHARED_LIB_VERSION=2:0:1
 AC_SUBST(SHARED_LIB_VERSION)
-ac_link="${SHELL} ${srcdir}/libtool --mode=link $ac_link"
 
 # debug mode
 AC_ARG_ENABLE(debug, 
@@ -57,10 +56,10 @@ else
 fi
 
 # Checks for libraries.
-AC_CHECK_LIB(m, expf)
+AC_CHECK_LIB(m, logf, [], [ AC_MSG_ERROR([math lib not found]) ])
 
 # Checks for header files.
-AC_CHECK_HEADERS([fcntl.h netinet/in.h stdlib.h string.h sys/file.h sys/param.h sys/time.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h math.h stdlib.h string.h sys/file.h sys/param.h sys/time.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
