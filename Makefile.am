@@ -9,7 +9,7 @@ DIST_SUBDIRS = libscws cli etc
 
 EXTRA_DIST = API.md phpext win32
 
-UNISON_OPT = -auto -batch -prefer newer -terse -times
+UNISON_OPT = -auto -batch -prefer newer -terse -times -logfile /dev/null
 	
 dict:
 	cd etc && make dict

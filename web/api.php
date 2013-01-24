@@ -68,7 +68,7 @@ if (!isset($_POST['data']))
 	</script>
 	<form method="post" action="$apiurl">
 		<textarea cols="80" rows="4" name="data"></textarea><br />
-		复合分词：<input type="hidden2" name="multi" value="0" />
+		复合分词：<input type="hidden" name="multi" value="0" />
 		<input type="checkbox" onclick="set_multi(this,1)" />最短词
 		<input type="checkbox" onclick="set_multi(this,2)" />散字二元
 		<input type="checkbox" onclick="set_multi(this,4)" />重要单字
@@ -118,7 +118,7 @@ if ($charset !== 'utf8' && $respond == 'json')
 $ignore = (isset($_POST['ignore']) && !strcasecmp($_POST['ignore'], 'yes')) ? true : false;
 $duality = (isset($_POST['duality']) && !strcasecmp($_POST['duality'], 'yes')) ? true : false;
 $traditional = (isset($_POST['traditional']) && !strcasecmp($_POST['traditional'], 'yes')) ? true : false;
-$multi = isset($_POST['duality']) ? intval($_POST['duality']) : 0;
+$multi = isset($_POST['multi']) ? intval($_POST['multi']) : 0;
 if ($multi < 0 || $multi > 15)
 	output_result(set_simple_result('Invalid parameter: multi'));
 
