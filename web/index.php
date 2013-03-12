@@ -173,4 +173,12 @@
 		</tr>		
 	</table>
 </div>
+<div class="block">
+	<h2>友情链接</h2>
+	<p>
+		<a href="http://www.czxiu.com/" target="_blank">QQ表情</a>
+		<a href="http://id.czxiu.com/" target="_blank">搞笑证件</a>
+		<a href="http://www.xunsearch.com" target="_blank">Xunsearch</a>
+	</p>
+</div>
 <?php include 'footer.inc.php'; ?>
