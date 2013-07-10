@@ -30,6 +30,7 @@ else
 
 // other options
 $ignore = $showa = $stats = $duality = false;
+$checked_ignore = $checked_showa = $checked_stats = $checked_duality = '';
 
 // 是否清除标点符号
 if (isset($_REQUEST['ignore']) && !strcmp($_REQUEST['ignore'], 'yes'))
