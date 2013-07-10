@@ -25,6 +25,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef HAVE_FLOCK
+#   include <sys/file.h>
+#endif
+
 #ifdef HAVE_MMAP
 #   include <sys/mman.h>
 #endif
