@@ -31,4 +31,5 @@ cli/scws
 cli/scws-gen-dict
 libscws/version.h
 web/demo/a.php
+web/demo/autocat/
 
