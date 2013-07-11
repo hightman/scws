@@ -552,8 +552,32 @@ static void _scws_mset_word(scws_t s, int i, int j)
 		{
 			while (m < j)
 			{
-				SCWS_PUT_RES(s->zmap[m].start, s->wmap[m][m]->idf, (s->zmap[m+1].end - s->zmap[m].start), s->wmap[m][m]->attr);
+				if (SCWS_IS_ECHAR(s->wmap[m][m]->flag))
+				{
+					SCWS_PUT_RES(s->zmap[m].start, s->wmap[m][m]->idf, (s->zmap[m].end - s->zmap[m].start), s->wmap[m][m]->attr);
+					s->wmap[m][m]->flag |= SCWS_ZFLAG_PUT;
+				}
+				else if (SCWS_IS_ECHAR(s->wmap[m+1][m+1]->flag))
+				{
+					if (m == i)
+					{
+						SCWS_PUT_RES(s->zmap[m].start, s->wmap[m][m]->idf, (s->zmap[m].end - s->zmap[m].start), s->wmap[m][m]->attr);
+						s->wmap[m][m]->flag |= SCWS_ZFLAG_PUT;
+					}
+					m++;
+					SCWS_PUT_RES(s->zmap[m].start, s->wmap[m][m]->idf, (s->zmap[m].end - s->zmap[m].start), s->wmap[m][m]->attr);
+					s->wmap[m][m]->flag |= SCWS_ZFLAG_PUT;
+				}
+				else
+				{
+					SCWS_PUT_RES(s->zmap[m].start, s->wmap[m][m]->idf, (s->zmap[m+1].end - s->zmap[m].start), s->wmap[m][m]->attr);
+				}
 				m++;
+				if (m == j && (SCWS_IS_ECHAR(s->wmap[m][m]->flag) || SCWS_IS_ECHAR(s->wmap[m-1][m-1]->flag)))
+				{
+					SCWS_PUT_RES(s->zmap[m].start, s->wmap[m][m]->idf, (s->zmap[m].end - s->zmap[m].start), s->wmap[m][m]->attr);
+					s->wmap[m][m]->flag |= SCWS_ZFLAG_PUT;
+				}
 			}
 		}
 	}
@@ -1174,6 +1198,7 @@ scws_res_t scws_get_result(scws_t s)
 				break;
 			
 			pflag &= ~PFLAG_VALID;
+			// 夹在中文间的英文数字最多允许 2 个字符 (超过2可以独立成词没啥问题)
 			for (i = off+1; i < (off+3); i++)
 			{
 				ch = txt[i];
