@@ -30,6 +30,12 @@
 			<a href="http://www.xunsearch.com" target="_blank">xunsearch（迅搜）</a>发布，是非常好用的 php 全文解决方案！
 		</li>
 		<li class="important">
+		<dt>2013-7-11: SCWS-1.2.2 Released.</dt>
+		<dd>1) 改进中英夹杂的长词复合分法，比如 "奥迪A6/奥迪/A6" </dd>
+		<dd>2) 修正 pscws23 演示文件的一些写法与新版 PHP 不兼容</dd>
+		<dd>3) 修正一些 configure 检测错误</dd>
+		</li>
+		<li>
 		<dt>2013-1-15: SCWS-1.2.1 Released.</dt>
 		<dd>1) 将源码迁移并托管到 <a href="https://github.com/hightman/scws" target="_blank">github</a></dd>
 		<dd>2) 改进 C API 中 scws_fork() 的算法，使之更为合理</dd>		 
