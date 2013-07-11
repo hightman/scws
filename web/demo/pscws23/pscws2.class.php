@@ -367,7 +367,8 @@ class PSCWS2
 		}
 
 		// 将结果返回
-		return (empty($cb) ? $ret : true);
+		if (empty($cb)) $ret = true;
+		return $ret;
 	}
 
 	// 切分纯中文句子 [核心函数] (正向最大匹配, N级词频比较消岐)
