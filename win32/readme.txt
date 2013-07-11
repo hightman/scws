@@ -3,6 +3,7 @@
 scws.dsw: VC6 工程文件
 scws.sln：VC9(vs2008) 工程文件
 
+如果发布 xdict.h 有各种错误提示，可以尝试将 xdict.h 另存为 ANSI 格式。
 
 编译前的准备工作：
 在 scws-1.x.y/ 同级的目录下放置 php 源码目录，对应如下：

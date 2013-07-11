@@ -25,5 +25,6 @@ sync-web:
 
 dist-web: dist-bzip2
 	mv -f $(distdir).tar.bz2 web/down
+	cd etc && tar czf ../web/down/rules.tgz *.ini
 	make sync-web
 
