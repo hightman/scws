@@ -368,7 +368,8 @@ class PSCWS3
 		}
 		
 		// 将结果返回
-		return (empty($cb) ? $ret : true);
+		if (empty($cb)) $ret = true;
+		return $ret;
 	}
 	
 	// 切分纯中文句子 [核心函数]
@@ -525,6 +526,7 @@ class PSCWS3
 		{
 			for ($j = 0; $j < $len; $j++)
 			{
+				if (!isset($ret[$i])) $ret[$i] = '';
 				$ret[$i] .= substr($sen, $j  * 2, 2);
 				if ($left_label[$j] == 1)
 					$i++;
@@ -536,6 +538,7 @@ class PSCWS3
 			{				
 				if ($right_label[$j] == 1)
 					$i++;
+				if (!isset($ret[$i])) $ret[$i] = '';
 				$ret[$i] .= substr($sen, $j  * 2, 2);
 			}
 		}
@@ -668,7 +671,7 @@ class PSCWS3
 
 			$zh = substr($this->_cur_sen_buf, $off * 2, 2);
 			
-			if (($p = strpos($this->_mb_foreign_chars, $zh)) === false
+			if (($p = strpos($this->_foreign_chars, $zh)) === false
 				|| ($p & 0x01))
 				break;
 

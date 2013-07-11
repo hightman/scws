@@ -296,7 +296,7 @@ class sql_Dictionary
 
 // 基于纯文本, [word\tfreq\r\n]
 // 自动检测 eAccelerator 的扩展运用
-define ('_EAKEY_DICT_',		'ea_dict');
+if (!defined('_EAKEY_DICT_')) define ('_EAKEY_DICT_', 'ea_dict');
 if (!defined('_WORD_ALONE_')) define ('_WORD_ALONE_', 0x4000000);
 if (!defined('_WORD_PART_')) define ('_WORD_PART_',	0x8000000);
 

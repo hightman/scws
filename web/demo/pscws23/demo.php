@@ -120,6 +120,8 @@ else
 {
 	// 部分参数选项
 	$checked_ignore = $checked_autodis = $checked_v2 = '';
+	$checked_stats = $checked_debug = '';
+	$selected_cdb = $selected_gdbm = $selected_sqlite = $selected_text = '';
 	
 	// 是否指定有第 2 版
 	if (isset($_REQUEST['version']) && $_REQUEST['version'] == 2)
