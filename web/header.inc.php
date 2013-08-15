@@ -102,5 +102,6 @@ li.first dd { font-size: 12px; line-height: 200%; }
 	<a href="<?php echo $item[0]; ?>"<?php echo strstr($_SERVER['SCRIPT_NAME'], $item[0]) ? ' class="active"' : ''; ?><?php echo isset($item[2]) ? ' title="' . $item[2] . '"' : ''; ?>><?php echo $item[1]; ?></a>
 	<?php endforeach; ?>
 	<a href="http://bbs.xunsearch.com/forumdisplay.php?fid=8" target="_blank">论坛</a>
+	<a href="http://www.xunsearch.com/site/donate" title="有您的支持我们会做得更好" target="_blank">捐赠</a>	
 	<a href="https://github.com/hightman/scws/" title="scws 代码已全部托管在 github！" class="last">源码@github</a>	
 </div>
