@@ -408,10 +408,17 @@ static void _scws_ssegment(scws_t s, int end)
 							pflag = 0;
 							break;
 						}
+						// wlen = 1
+						if (wlen == 1 && SCWS_IS_ALPHA(ch))
+						{
+							pflag ^= PFLAG_DIGIT;
+							pflag |= PFLAG_ADDSYM;
+							continue;
+						}
 						// strict must add: !$this->_is_digit(ord($this->txt[$start+1])))
-						if ((pflag & PFLAG_ADDSYM) || ch != 0x2e || !SCWS_IS_DIGIT(txt[start+1]))
+						if ((pflag & PFLAG_ADDSYM) || !(ch == 0x2e && SCWS_IS_DIGIT(txt[start+1])))
 							break;
-						pflag |= PFLAG_ADDSYM;												
+						pflag |= PFLAG_ADDSYM;
 					}
 				}
 				else
@@ -421,8 +428,12 @@ static void _scws_ssegment(scws_t s, int end)
 						pflag |= PFLAG_ADDSYM;
 					else if (!SCWS_IS_ALPHA(ch))
 					{
-						if ((pflag & PFLAG_ADDSYM) || ch != 0x27 || !SCWS_IS_ALPHA(txt[start+1]))
+						if ((pflag & PFLAG_ADDSYM)
+							|| !((ch == 0x27 && SCWS_IS_ALPHA(txt[start+1]))
+								|| (SCWS_IS_DIGIT(ch) && !SCWS_IS_DIGIT(txt[start+1]))))
+						{
 							break;
+						}
 						pflag |= PFLAG_ADDSYM;
 					}
 				}

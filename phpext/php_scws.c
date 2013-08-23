@@ -43,7 +43,7 @@
 static zend_class_entry *scws_class_entry_ptr;
 static int le_scws;
 
-#define PHP_SCWS_MODULE_VERSION		"0.2.2"
+#define PHP_SCWS_MODULE_VERSION		"0.2.3-dev"
 #define	PHP_SCWS_DEFAULT_CHARSET	"gbk"
 #define	PHP_SCWS_OBJECT_TAG			"scws handler"
 #define	DELREF_SCWS(x)	{	\
