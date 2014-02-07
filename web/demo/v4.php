@@ -53,7 +53,7 @@ if (isset($_REQUEST['showa']) && !strcmp($_REQUEST['showa'], 'yes'))
 	$checked_showa = ' checked';
 }
 
-// 是转看统计表
+// 是否只看统计表
 if (isset($_REQUEST['stats']) && !strcmp($_REQUEST['stats'], 'yes'))
 {
 	$stats = true;
