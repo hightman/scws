@@ -28,6 +28,7 @@ $TEST_DATA =
 array(
 	'大家好，我是马明练' => array('result' => '大家 好 ， 我 是 马明练', 'option' => 0),
 	'结合成分子时' => array('result' => '结合 成 分子 时', 'option' => 0),
+	'上海欣辰文化传播有限公司' => array('result' => '上海 欣 辰 文化传播 有限公司', 'option' => 0),
 	'提高人民生活水平' => array('result' => '提高 人民 生活 水平', 'option' => 0),
 	'奥巴马上台后中美关系如何变革' => array('result' => '奥巴马 上台 后 中美关系 如何 变革', 'option' => 0),
 	'一九四九年，新中国成立了' => array('result' => '一九四九年 ， 新中国 成立 了', 'option' => 0),	
