@@ -880,6 +880,7 @@ static void _scws_msegment(scws_t s, int end, int zlen)
 	if (s->r == NULL)
 		goto do_segment;
 	
+#if 0	/* 20150403: Remove rules, just deepend on dictionary */
 	/* auto rule set for name & zone & chinese numeric */
 
 	/* one word auto rule check */
@@ -1093,6 +1094,7 @@ static void _scws_msegment(scws_t s, int end, int zlen)
 			continue;
 		}
 	}
+#endif
 
 	/* real do the segment */
 do_segment:
