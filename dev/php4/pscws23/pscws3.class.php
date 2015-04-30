@@ -431,7 +431,7 @@ class PSCWS3
 		{
 			$mydog = _CRLF_ . str_repeat('------+', $len + 1) . '------' .  _CRLF_;
 
-			echo '句字组合关系图: `' . $sen . '`';
+			echo '句字组合关系图: `' , $sen , '`';
 			echo $mydog;
 
 			$head = '(字序)|';

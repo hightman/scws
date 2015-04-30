@@ -6,7 +6,7 @@ $module = 'scws';
 $functions = get_extension_funcs($module);
 echo "Functions available in the $moduel extension:\n";
 foreach($functions as $func) {
-    echo $func . "\n";
+    echo $func , "\n";
 }
 echo "\n";
 $function = $module . '_version';

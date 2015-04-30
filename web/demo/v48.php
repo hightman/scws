@@ -115,7 +115,7 @@ small		{ font-size: 12px; }
 	    <span style="color:#666666;">		
 	    <strong>[复合分词选项]</strong>
 <?php foreach ($mtags as $mtag => $mval) { ?>
-		<input type=checkbox name="multi[]" value=<?php echo $mval . " " . (($multi & $mval) ? " checked" : "");?>><?php echo $mtag;?>&nbsp;
+		<input type=checkbox name="multi[]" value=<?php echo $mval , " " , (($multi & $mval) ? " checked" : "");?>><?php echo $mtag;?>&nbsp;
 <?php } ?>
 		</span>
 	    <br />
