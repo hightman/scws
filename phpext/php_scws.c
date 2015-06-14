@@ -38,6 +38,29 @@
 #define	ZVAL_DELREF		Z_DELREF_P
 #endif
 
+/// hightman.20150614: for PHP7+
+#if PHP_MAJOR_VERSION >= 7
+#undef	FREE_ZVAL
+#undef	ZEND_REGISTER_RESOURCE
+#undef	RETVAL_RESOURCE
+#undef	MAKE_STD_ZVAL
+#undef	RETURN_STRING
+#undef	add_assoc_string
+#undef	add_assoc_stringl
+
+#define FREE_ZVAL						efree_rel
+#define ZEND_REGISTER_RESOURCE(x,y,z)	zend_register_resource(y,z)
+#define RETVAL_RESOURCE					RETVAL_RES
+#define MAKE_STD_ZVAL(x)				x = (zval *) emalloc(sizeof(zval))
+#define RETURN_STRING(a,b)				RETVAL_STRING(a); return
+#define add_assoc_string(a,b,c,d)		add_assoc_string_ex(a,b,strlen(b),c)
+#define add_assoc_stringl(a,b,c,d,e)	add_assoc_stringl_ex(a,b,strlen(b),(char*)c,d)
+
+typedef size_t	str_size_t;
+#else
+typedef int str_size_t;
+#endif
+
 /// ZEND_DECLARE_MODULE_GLOBALS(scws)
 
 static zend_class_entry *scws_class_entry_ptr;
@@ -94,12 +117,59 @@ if (ps->s->r == NULL || ps->s->d == NULL) {	\
 	}	\
 }
 
+#if PHP_MAJOR_VERSION >= 7
+#define	SCWS_FETCH_PARAMETERS(ts, ...)	\
+	do {	\
+		zval *tmp = getThis();	\
+		if (tmp) {	\
+			tmp = zend_hash_str_find(Z_OBJPROP_P(tmp), "handle", sizeof("handle") - 1);	\
+			if (tmp == NULL) {	\
+				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	\
+				RETURN_FALSE;	\
+			}	\
+			if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, ts, ##__VA_ARGS__) == FAILURE) {	\
+				return;	\
+			}	\
+		} else {	\
+			if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r" ts, &tmp, ##__VA_ARGS__) == FAILURE) {	\
+				return;	\
+			}	\
+		}	\
+		ps = (struct php_scws *) zend_fetch_resource_ex(tmp, PHP_SCWS_OBJECT_TAG, le_scws);	\
+	} while(0)
+#else
+#define	SCWS_FETCH_PARAMETERS(ts, ...)	\
+	do {	\
+		zval **tmp;	\
+		zval *object = getThis();	\
+		if (object) {	\
+			if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {	\
+				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	\
+				RETURN_FALSE;	\
+			}	\
+			if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, ts, ##__VA_ARGS__) == FAILURE) {	\
+				return;	\
+			}	\
+		} else {	\
+			if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r" ts, &object, ##__VA_ARGS__) == FAILURE) {	\
+				return;	\
+			}	\
+			tmp = &object;	\
+		}	\
+		ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);	\
+	} while(0)
+#endif
+
 struct php_scws
 {
 	scws_t s;
 	zval *zt;
 	char charset[8];
+#if PHP_MAJOR_VERSION >= 7
+	zend_resource *rsrc_id;
+#else
 	int rsrc_id;
+#endif
 };
 
 zend_function_entry scws_functions[] = {
@@ -142,15 +212,19 @@ static zend_function_entry php_scws_class_functions[] = {
 
 static ZEND_RSRC_DTOR_FUNC(php_scws_dtor)
 {
-	if (rsrc->ptr) 
-	{
+#if PHP_MAJOR_VERSION == 7
+#define rsrc	res
+#endif
+	if (rsrc->ptr) {
 		struct php_scws *ps = (struct php_scws *) rsrc->ptr;
-
 		scws_free(ps->s);
 		DELREF_SCWS(ps->zt);
 		efree(ps);
 		rsrc->ptr = NULL;
 	}
+#if PHP_MAJOR_VERSION == 7
+#undef rsrc
+#endif
 }
 
 zend_module_entry scws_module_entry = {
@@ -233,14 +307,16 @@ static void *_php_create_scws(TSRMLS_D)
 	scws_t s;
 
 	s = scws_new();
-	if (s == NULL)			
+	if (s == NULL) {
 		return NULL;	
+	}
 
 	ps = (struct php_scws *)emalloc(sizeof(struct php_scws));
 	ps->s = s;
 	ps->zt = NULL;
 	ps->charset[0] = '\0';
 	ps->rsrc_id = ZEND_REGISTER_RESOURCE(NULL, ps, le_scws);
+
 	ini_cs = INI_STR("scws.default.charset");
 	if (ini_cs != NULL && *ini_cs) {	
 		memset(ps->charset, 0, sizeof(ps->charset));
@@ -254,26 +330,26 @@ static void *_php_create_scws(TSRMLS_D)
 PHP_FUNCTION(scws_open)
 {
 	struct php_scws *ps;
-	
+
 	ps = (struct php_scws *)_php_create_scws(TSRMLS_C);
 	if (ps == NULL) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Can't create new scws handler");
 		RETURN_FALSE;
 	}
-	
+
 	RETVAL_RESOURCE(ps->rsrc_id);
 }
 
 PHP_FUNCTION(scws_new)
 {
 	struct php_scws *ps;
-	
+
 	ps = (struct php_scws *)_php_create_scws(TSRMLS_C);
 	if (ps == NULL) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Can't create new scws object");
 		RETURN_FALSE;
 	}
-	
+
 	object_init_ex(return_value, scws_class_entry_ptr);
 	add_property_resource(return_value, "handle", ps->rsrc_id);
 }
@@ -281,48 +357,19 @@ PHP_FUNCTION(scws_new)
 PHP_FUNCTION(scws_close)
 {
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &object) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
+
+	SCWS_FETCH_PARAMETERS("");
+
 	zend_list_delete(ps->rsrc_id);
 }
 
 PHP_FUNCTION(scws_set_charset)
 {
 	char *cs;
-	int cs_len;
-	
+	str_size_t cs_len;
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
 	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &cs, &cs_len) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs", &object, &cs, &cs_len) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
+	SCWS_FETCH_PARAMETERS("s", &cs, &cs_len);
 	
 	memset(ps->charset, 0, sizeof(ps->charset));
 	strncpy(ps->charset, cs, sizeof(ps->charset)-1);
@@ -335,42 +382,27 @@ PHP_FUNCTION(scws_add_dict)
 {
 	long xmode = 0;
 	char *filepath, *fullpath = NULL;
-	int filepath_len;
-	
+	str_size_t filepath_len;
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|l", &filepath, &filepath_len, &xmode) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs|l", &object, &filepath, &filepath_len, &xmode) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
-	if (!(fullpath = expand_filepath(filepath, NULL TSRMLS_CC)))
+
+	SCWS_FETCH_PARAMETERS("s|l", &filepath, &filepath_len, &xmode);
+
+	if (!(fullpath = expand_filepath(filepath, NULL TSRMLS_CC))) {
 		RETURN_FALSE;
-		
+	}
+
 #if PHP_API_VERSION < 20100412
 	if (PG(safe_mode) && (!php_checkuid(fullpath, NULL, CHECKUID_CHECK_FILE_AND_DIR))) {
 		efree(fullpath);
 		RETURN_FALSE;
 	}
 #endif
-	
+
 	if (php_check_open_basedir(fullpath TSRMLS_CC)) {
 		efree(fullpath);
 		RETURN_FALSE;
 	}
-	
+
 	xmode = (int) scws_add_dict(ps->s, fullpath, xmode);
 	efree(fullpath);
 
@@ -386,42 +418,27 @@ PHP_FUNCTION(scws_set_dict)
 {
 	long xmode = 0;
 	char *filepath, *fullpath = NULL;
-	int filepath_len;
-	
+	str_size_t filepath_len;
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|l", &filepath, &filepath_len, &xmode) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs|l", &object, &filepath, &filepath_len, &xmode) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
-	if (!(fullpath = expand_filepath(filepath, NULL TSRMLS_CC)))
+
+	SCWS_FETCH_PARAMETERS("s|l", &filepath, &filepath_len, &xmode);
+
+	if (!(fullpath = expand_filepath(filepath, NULL TSRMLS_CC))) {
 		RETURN_FALSE;
-		
+	}
+	
 #if PHP_API_VERSION < 20100412
 	if (PG(safe_mode) && (!php_checkuid(fullpath, NULL, CHECKUID_CHECK_FILE_AND_DIR))) {
 		efree(fullpath);
 		RETURN_FALSE;
 	}
 #endif
-	
+
 	if (php_check_open_basedir(fullpath TSRMLS_CC)) {
 		efree(fullpath);
 		RETURN_FALSE;
 	}
-	
+
 	xmode = (int) scws_set_dict(ps->s, fullpath, xmode);
 	efree(fullpath);
 
@@ -436,42 +453,27 @@ PHP_FUNCTION(scws_set_dict)
 PHP_FUNCTION(scws_set_rule)
 {
 	char *filepath, *fullpath = NULL;
-	int filepath_len;
-	
+	str_size_t filepath_len;
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &filepath, &filepath_len) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs", &object, &filepath, &filepath_len) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
-	if (!(fullpath = expand_filepath(filepath, NULL TSRMLS_CC)))
+
+	SCWS_FETCH_PARAMETERS("s", &filepath, &filepath_len);
+
+	if (!(fullpath = expand_filepath(filepath, NULL TSRMLS_CC))) {
 		RETURN_FALSE;
-		
+	}
+	
 #if PHP_API_VERSION < 20100412
 	if (PG(safe_mode) && (!php_checkuid(fullpath, NULL, CHECKUID_CHECK_FILE_AND_DIR))) {
 		efree(fullpath);
 		RETURN_FALSE;
 	}
 #endif
-	
+
 	if (php_check_open_basedir(fullpath TSRMLS_CC)) {
 		efree(fullpath);
 		RETURN_FALSE;
 	}
-	
+
 	scws_set_rule(ps->s, fullpath);
 	efree(fullpath);
 
@@ -486,26 +488,10 @@ PHP_FUNCTION(scws_set_rule)
 PHP_FUNCTION(scws_set_ignore)
 {
 	zend_bool boolset = 1;
-	
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "b", &boolset) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rb", &object, &boolset) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
+
+	SCWS_FETCH_PARAMETERS("b", &boolset);
+
 	scws_set_ignore(ps->s, boolset ? SCWS_YEA : SCWS_NA);
 	RETURN_TRUE;
 }
@@ -513,29 +499,14 @@ PHP_FUNCTION(scws_set_ignore)
 PHP_FUNCTION(scws_set_multi)
 {
 	long multi = 0;
-	
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &multi) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rl", &object, &multi) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
-	if (multi < 0 || (multi & 0x10))
+
+	SCWS_FETCH_PARAMETERS("l", &multi);
+
+	if (multi < 0 || (multi & 0x10)) {
 		RETURN_FALSE;
-		
+	}
+
 	scws_set_multi(ps->s, (multi<<12));
 	RETURN_TRUE;
 }
@@ -543,26 +514,10 @@ PHP_FUNCTION(scws_set_multi)
 PHP_FUNCTION(scws_set_duality)
 {
 	zend_bool boolset = 1;
-	
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "b", &boolset) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rb", &object, &boolset) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
+
+	SCWS_FETCH_PARAMETERS("b", &boolset);
+
 	scws_set_duality(ps->s, boolset ? SCWS_YEA : SCWS_NA);
 	RETURN_TRUE;
 }
@@ -570,31 +525,20 @@ PHP_FUNCTION(scws_set_duality)
 PHP_FUNCTION(scws_send_text)
 {
 	zval *text;
-	
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &text) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rz", &object, &text) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
+
+	SCWS_FETCH_PARAMETERS("z", &text);
+
+#if	PHP_MAJOR_VERSION >= 7
+	convert_to_string_ex(text);
+#else
 	convert_to_string_ex(&text);
+#endif
+
 	DELREF_SCWS(ps->zt);
 	ZVAL_ADDREF(text);
 	ps->zt = text;
-		
+
 	scws_send_text(ps->s, Z_STRVAL_P(ps->zt), Z_STRLEN_P(ps->zt));
 
 	CHECK_DR_SCWS();
@@ -606,40 +550,30 @@ PHP_FUNCTION(scws_get_result)
 {
 	zval *row;
 	scws_res_t res, cur;
-	
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r", &object) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
+
+	SCWS_FETCH_PARAMETERS("");
 	
 	cur = res = scws_get_result(ps->s);
-	if (res == NULL)		
+	if (res == NULL) {
 		RETURN_FALSE;
+	}
 	
 	array_init(return_value);
 	while (cur != NULL) {
 		MAKE_STD_ZVAL(row);
 		array_init(row);
-		add_assoc_stringl(row, "word", ps->s->txt + cur->off, cur->len, 1);
+		add_assoc_stringl(row, "word", (char *) ps->s->txt + cur->off, cur->len, 1);
 		add_assoc_long(row, "off", cur->off);
 		add_assoc_long(row, "len", cur->len);
 		add_assoc_double(row, "idf", (double) cur->idf);
 		add_assoc_stringl(row, "attr", cur->attr, (cur->attr[1] == '\0' ? 1 : 2), 1);
 		
 		cur = cur->next;
-		add_next_index_zval(return_value, row);
+		add_next_index_zval(return_value, row);		
+#if PHP_MAJOR_VERSION >= 7
+		efree(row);
+#endif
 	}
 	scws_free_result(res);
 }
@@ -649,35 +583,19 @@ PHP_FUNCTION(scws_get_tops)
 {
 	long limit = 0;
 	char *attr = NULL;
-	int attr_len;
+	str_size_t attr_len;
 	scws_top_t top, cur;
 	zval *row;
-	
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|ls", &limit, &attr, &attr_len) == FAILURE)
-			return;	
+
+	SCWS_FETCH_PARAMETERS("|ls", &limit, &attr, &attr_len);
+
+	if (limit <= 0) {
+		limit = 10;
 	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "r|ls", &object, &limit, &attr, &attr_len) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-	
-	if (limit <= 0) limit = 10;
-	
 	cur = top = scws_get_tops(ps->s, limit, attr);
 	array_init(return_value);
-	while (cur != NULL)
-	{
+	while (cur != NULL) {
 		MAKE_STD_ZVAL(row);
 		array_init(row);
 
@@ -688,6 +606,9 @@ PHP_FUNCTION(scws_get_tops)
 
 		cur = cur->next;
 		add_next_index_zval(return_value, row);
+#if PHP_MAJOR_VERSION >= 7
+		efree(row);
+#endif
 	}
 	scws_free_tops(top);
 }
@@ -696,29 +617,14 @@ PHP_FUNCTION(scws_get_tops)
 PHP_FUNCTION(scws_has_word)
 {
 	char *attr;
-	int attr_len;
-	
+	str_size_t attr_len;
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &attr, &attr_len) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs", &object, &attr, &attr_len) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
 
-	if (scws_has_word(ps->s, attr) == 0)
+	SCWS_FETCH_PARAMETERS("s", &attr, &attr_len);
+
+	if (scws_has_word(ps->s, attr) == 0) {
 		RETURN_FALSE;
+	}
 
 	RETURN_TRUE;	
 }
@@ -727,33 +633,16 @@ PHP_FUNCTION(scws_has_word)
 PHP_FUNCTION(scws_get_words)
 {
 	char *attr;
-	int attr_len;
+	str_size_t attr_len;
 	scws_top_t top, cur;
 	zval *row;
-	
 	struct php_scws *ps;
-	zval **tmp;
-	zval *object = getThis();
-	
-	if (object) {
-		if (zend_hash_find(Z_OBJPROP_P(object), "handle", sizeof("handle"), (void **)&tmp) == FAILURE) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find the handle property");	
-			RETURN_FALSE;
-		}
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &attr, &attr_len) == FAILURE)
-			return;	
-	}
-	else {
-		if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs", &object, &attr, &attr_len) == FAILURE)
-			return;
-		tmp = &object;
-	}
-	ZEND_FETCH_RESOURCE(ps, struct php_scws *, tmp, -1, PHP_SCWS_OBJECT_TAG, le_scws);
-		
+
+	SCWS_FETCH_PARAMETERS("s", &attr, &attr_len);
+
 	array_init(return_value);
 	cur = top = scws_get_words(ps->s, attr);
-	while (cur != NULL)
-	{
+	while (cur != NULL) {
 		MAKE_STD_ZVAL(row);
 		array_init(row);
 		add_assoc_string(row, "word", cur->word, 1);
@@ -763,6 +652,9 @@ PHP_FUNCTION(scws_get_words)
 
 		cur = cur->next;
 		add_next_index_zval(return_value, row);
+#if PHP_MAJOR_VERSION >= 7
+		efree(row);
+#endif
 	}
 	scws_free_tops(top);
 }
@@ -775,6 +667,13 @@ PHP_FUNCTION(scws_version)
 		PHP_SCWS_MODULE_VERSION, SCWS_VERSION);
 	RETURN_STRING(buf, 1);
 }
+
+/// hightman.20150614: for PHP7+
+#if PHP_MAJOR_VERSION >= 7
+#undef	RETURN_STRING
+#undef	add_assoc_string
+#undef	add_assoc_stringl
+#endif
 
 /*
  * Local variables:
