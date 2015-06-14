@@ -160,7 +160,7 @@ function output_result($result)
 	if ($respond === 'xml')
 	{
 		header('Content-Type: text/xml; charset=' . $charset);
-		echo '<?xml version="1.0" encoding="' . $charset . '"?>' . "\n";
+		echo '<?xml version="1.0" encoding="' , $charset , '"?>' , "\n";
 		echo array_to_xml($result, '', 'respond');
 	}
 	else

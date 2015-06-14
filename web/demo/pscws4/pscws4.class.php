@@ -870,7 +870,7 @@ class PSCWS4
 				for ($x = 0, $m = $f; ($n = $npath[$x]) != 0xff; $x++)
 				{
 					$n += $m;
-					echo $this->_get_zs($m, $n) . " ";
+					echo $this->_get_zs($m, $n) , " ";
 					$m = $n + 1;
 				}
 				echo "\n--\n";

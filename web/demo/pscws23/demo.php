@@ -56,7 +56,7 @@ function words_cb($ar)
 			echo $tmp;
 			continue;
 		}
-		echo $tmp . ' ';
+		echo $tmp , ' ';
 	}
 	flush();
 }

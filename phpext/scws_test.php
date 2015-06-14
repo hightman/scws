@@ -117,7 +117,7 @@ $scws->close();
 $start -= 1;
 echo "// -------------------------------------\n";
 echo "// TEST result report\n";
-echo "// " . $scws->version() . "\n";
+echo "// " , $scws->version() , "\n";
 echo "// -------------------------------------\n";
 echo "// Total test: $start\n";
 printf("// Passed Num: %d (%.2f%%)\n", $success, 100 * $success / $start);

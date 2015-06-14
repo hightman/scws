@@ -381,8 +381,8 @@ class PSCWS2
 
 		if ($this->_debug)
 		{
-			echo _CRLF_ . "中文短句: {$sen}";
-			echo _CRLF_ . "____________________________////";
+			echo _CRLF_ , "中文短句: {$sen}";
+			echo _CRLF_ , "____________________________////";
 			flush();
 		}
 
@@ -427,7 +427,7 @@ class PSCWS2
 
 		if ($this->_debug)
 		{
-			echo _CRLF_ . "\\\\\\\\____________________________" . _CRLF_;
+			echo _CRLF_ , "\\\\\\\\____________________________" , _CRLF_;
 			flush();
 		}
 
@@ -459,7 +459,7 @@ class PSCWS2
 
 			// debug message
 			if ($this->_debug)
-				echo _CRLF_ . str_repeat("  ", _WORD_CKDEPTH_ - $rc) . "检测: {$w} ... ";
+				echo _CRLF_ , str_repeat("  ", _WORD_CKDEPTH_ - $rc) , "检测: {$w} ... ";
 
 			$r = $this->_dict->find($w);
 			if ($r < 0)
@@ -500,7 +500,7 @@ class PSCWS2
 			// debug message
 			if ($this->_debug)
 			{
-				echo _CRLF_ . str_repeat("  ", _WORD_CKDEPTH_ - $rc);
+				echo _CRLF_ , str_repeat("  ", _WORD_CKDEPTH_ - $rc);
 				echo "消岐: 复查({$off1} ~ {$off2})";
 			}
 
@@ -513,8 +513,8 @@ class PSCWS2
 
 					if ($this->_debug)
 					{
-						echo _CRLF_ . str_repeat("  ", _WORD_CKDEPTH_ - $rc) . "发现较高频词汇(";
-						echo substr($this->_cur_sen_buf, $off1, $chk[0]) . "),";
+						echo _CRLF_ , str_repeat("  ", _WORD_CKDEPTH_ - $rc) , "发现较高频词汇(";
+						echo substr($this->_cur_sen_buf, $off1, $chk[0]) , "),";
 						echo "词语被裁断至 {$plen} 处";
 					}
 
@@ -527,8 +527,8 @@ class PSCWS2
 		// debug message
 		if ($this->_debug)
 		{
-			echo _CRLF_ . str_repeat("  ", _WORD_CKDEPTH_ - $rc) . "结果: ";
-			echo substr($w, 0, $ret[0]) . "({$ret[0]}) ... ";
+			echo _CRLF_ , str_repeat("  ", _WORD_CKDEPTH_ - $rc) , "结果: ";
+			echo substr($w, 0, $ret[0]) , "({$ret[0]}) ... ";
 			flush();
 		}
 
@@ -549,7 +549,7 @@ class PSCWS2
 				$n = 0;
 
 				if ($this->_debug)
-					echo _CRLF_ . "  复姓: {$s2} ... ";
+					echo _CRLF_ , "  复姓: {$s2} ... ";
 
 				do
 				{
@@ -589,7 +589,7 @@ class PSCWS2
 				$n = 0;
 
 				if ($this->_debug)
-					echo _CRLF_ . "  单姓: {$s1} ... ";
+					echo _CRLF_ , "  单姓: {$s1} ... ";
 
 				do
 				{

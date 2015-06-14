@@ -43,7 +43,7 @@ $cws->set_rule('etc/rules.ini');
 $cws->send_text($text);
 
 if (php_sapi_name() != 'cli') header('Content-Type: text/plain');
-echo "pscws version: " . $cws->version() . "\n";
+echo "pscws version: " , $cws->version() , "\n";
 echo "Segment result:\n\n";
 while ($tmp = $cws->get_result())
 {	
