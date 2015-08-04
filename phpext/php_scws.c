@@ -55,9 +55,12 @@
 #define RETURN_STRING(a,b)				RETVAL_STRING(a); return
 #define add_assoc_string(a,b,c,d)		add_assoc_string_ex(a,b,strlen(b),c)
 #define add_assoc_stringl(a,b,c,d,e)	add_assoc_stringl_ex(a,b,strlen(b),(char*)c,d)
+#define ZEND_LIST_DELETE				zend_list_close
 
 typedef size_t	str_size_t;
 #else
+#define ZEND_LIST_DELETE				zend_list_delete
+
 typedef int str_size_t;
 #endif
 
@@ -218,7 +221,9 @@ static ZEND_RSRC_DTOR_FUNC(php_scws_dtor)
 	if (rsrc->ptr) {
 		struct php_scws *ps = (struct php_scws *) rsrc->ptr;
 		scws_free(ps->s);
+#if PHP_MAJOR_VERSION < 7
 		DELREF_SCWS(ps->zt);
+#endif
 		efree(ps);
 		rsrc->ptr = NULL;
 	}
@@ -360,7 +365,7 @@ PHP_FUNCTION(scws_close)
 
 	SCWS_FETCH_PARAMETERS("");
 
-	zend_list_delete(ps->rsrc_id);
+	ZEND_LIST_DELETE(ps->rsrc_id);
 }
 
 PHP_FUNCTION(scws_set_charset)
@@ -535,8 +540,10 @@ PHP_FUNCTION(scws_send_text)
 	convert_to_string_ex(&text);
 #endif
 
+#if PHP_MAJOR_VERSION < 7
 	DELREF_SCWS(ps->zt);
 	ZVAL_ADDREF(text);
+#endif
 	ps->zt = text;
 
 	scws_send_text(ps->s, Z_STRVAL_P(ps->zt), Z_STRLEN_P(ps->zt));
