@@ -768,7 +768,9 @@ static void _scws_msegment(scws_t s, int end, int zlen)
 	word_t **wmap, query;
 	struct scws_zchar *zmap;
 	unsigned char *txt;
+#ifdef HAVE_NAME_RULE	/* 20150403: Remove rules, just deepend on dictionary */
 	rule_item_t r1;
+#endif
 	int i, j, k, ch, clen, start;
 	pool_t p;
 
@@ -880,7 +882,7 @@ static void _scws_msegment(scws_t s, int end, int zlen)
 	if (s->r == NULL)
 		goto do_segment;
 	
-#if 0	/* 20150403: Remove rules, just deepend on dictionary */
+#ifdef HAVE_NAME_RULE	/* 20150403: Remove rules, just deepend on dictionary */
 	/* auto rule set for name & zone & chinese numeric */
 
 	/* one word auto rule check */
