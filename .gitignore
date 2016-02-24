@@ -16,6 +16,7 @@ aclocal.m4
 config.*
 configure
 depcomp
+compile
 install-sh
 missing
 stamp-h1

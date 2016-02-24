@@ -3,13 +3,13 @@
 # scws-1.x.x configure - modified by hightman
 
 AC_PREREQ([2.68])
-AC_INIT([scws], [1.2.3-dev], [http://www.xunsearch.com/scws])
+AC_INIT([scws], [1.2.3], [http://www.xunsearch.com/scws])
 
 # init automake
 AM_INIT_AUTOMAKE
 
 # copy right
-AC_COPYRIGHT([Copyright (C)2007-2013, hightman
+AC_COPYRIGHT([Copyright (C)2007-2016, hightman
 This package maybe copied, distributed and modified under
 the terms of my License; see COPYING for more details])
 
@@ -54,6 +54,12 @@ else
   tmp_cflags=`echo $CFLAGS | sed 's/-g//g'`	
   if test "$tmp_cflags" = "$CFLAGS"; then  CFLAGS="$CFLAGS -g"; fi
 fi
+
+# name rule
+AC_ARG_ENABLE(namerule,
+	AC_HELP_STRING([--enable-namerule], [Compile with pepole and road name recognition]),
+	[ AC_DEFINE(HAVE_NAME_RULE, 1,[enable people and road name recognition]) ]
+)
 
 # Checks for libraries.
 AC_CHECK_LIB(m, logf, [], [ AC_MSG_ERROR([math lib not found]) ])

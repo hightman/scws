@@ -5,20 +5,6 @@ EXTRA_DIST = rules.ini rules.utf8.ini rules_cht.utf8.ini
 
 sysconf_DATA = rules.ini rules.utf8.ini rules_cht.utf8.ini
 
-# install sysconf_DATA
-install-sysconfDATA:
-	@$(NORMAL_INSTALL)
-	test -z "$(sysconfdir)" || $(MKDIR_P) "$(DESTDIR)$(sysconfdir)"
-	@list='$(sysconf_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  if test "$(DESTDIR)$(sysconfdir)/$$f" -nt "$$d$$p"; then \
-	    echo " Ignore exists sysconf data file '$$p'"; else \
-	    echo " $(sysconfDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(sysconfdir)/$$f'"; \
-	    $(sysconfDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(sysconfdir)/$$f"; \
-	  fi; \
-	done	
-
 # dictionary
 dict_FILES = dict.xdb dict.utf8.xdb
 

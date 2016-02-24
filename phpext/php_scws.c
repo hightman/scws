@@ -12,7 +12,7 @@
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
-  | Author: hightman Mar (MingL_Mar@msn.com) QQ = 16139558               |
+  | Author: hightman (hightman[AT]twomice.net) QQ = 16139558             |
   +----------------------------------------------------------------------+
 */
 
@@ -69,7 +69,7 @@ typedef int str_size_t;
 static zend_class_entry *scws_class_entry_ptr;
 static int le_scws;
 
-#define PHP_SCWS_MODULE_VERSION		"0.2.3-dev"
+#define PHP_SCWS_MODULE_VERSION		"0.2.3"
 #define	PHP_SCWS_DEFAULT_CHARSET	"gbk"
 #define	PHP_SCWS_OBJECT_TAG			"scws handler"
 #define	DELREF_SCWS(x)	{	\

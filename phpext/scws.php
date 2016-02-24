@@ -4,7 +4,7 @@ if(!extension_loaded('scws')) {
 }
 $module = 'scws';
 $functions = get_extension_funcs($module);
-echo "Functions available in the $moduel extension:\n";
+echo "Functions available in the $module extension:\n";
 foreach($functions as $func) {
     echo $func , "\n";
 }

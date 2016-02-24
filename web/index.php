@@ -30,6 +30,13 @@
 			<a href="http://www.xunsearch.com" target="_blank">xunsearch（迅搜）</a>发布，是非常好用的 php 全文解决方案！
 		</li>
 		<li class="important">
+		<dt>2016-2-24: SCWS-1.2.3 Released.</dt>
+		<dd>1) 兼容支持 PHP7 扩展</dd>
+		<dd>2) 人名地名识别调整为编译选项 --enable-namerule 默认不开启</dd>
+		<dd>3) 修正并改进一些其它小问题，详见 github commits</dd>
+		<dd>4) 特别抱歉，由于环境关系此次发布没有包含 win32 编译包的更新</dd>
+		</li>
+		<li>
 		<dt>2013-7-11: SCWS-1.2.2 Released.</dt>
 		<dd>1) 改进中英夹杂的长词复合分法，比如 "奥迪A6/奥迪/A6" </dd>
 		<dd>2) 修正 pscws23 演示文件的一些写法与新版 PHP 不兼容</dd>

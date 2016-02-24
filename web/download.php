@@ -16,7 +16,7 @@ include 'header.inc.php';
 	</p>	
 </div>
 <div class="block">
-	<h2>php_scws.dll (<?php echo $version; ?>)<a name="dll">&nbsp;</a></h2>
+	<h2>php_scws.dll (<?php echo '1.2.2'; ?>)<a name="dll">&nbsp;</a></h2>
 	<p>php_scws.dll 是由 <a href="http://www.yanbin.org" target="_blank">ben</a> 移植用于 Windows 平台下的 PHP 动态扩展库，请根据您使用的版本下载，均为 x86 环境。其他版本的 PHP 或环境请自行根据源码目录下的 phpext/win32 构建。（NTS 表示 Non-Thread-Safety)</p>
 	<p>
 	　[<a href="down/php-4.4.x/php_scws.dll">PHP-4.4.x</a> (44KB/VC6/ZTS)]
