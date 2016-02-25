@@ -14,19 +14,16 @@ function get_tfidf($word, $count)
 
 function get_count($word)
 {
-	$url  = "http://www.baidu.com/s?ie=gb2312&wd=" . urlencode($word);
+	$url  = "http://www.baidu.com/s?wd=" . urlencode($word);
 	$data = @file_get_contents($url);
 	if (!$data) return -1;
-	$pos = -1;
-	$pos1 = @strpos($data, "ÕÒµ½Ïà¹ØÍøÒ³Ô¼", 2048) + 14;
-	$pos0 = @strpos($data, "ÕÒµ½Ïà¹ØÍøÒ³", 2048) + 12;
-	$pos = ($pos1 > 14 ? $pos1 : $pos0);
+	$pos0 = @strpos($data, "æ‰¾åˆ°ç›¸å…³ç»“æœçº¦", 2048) + @strlen("æ‰¾åˆ°ç›¸å…³ç»“æœçº¦");
+	$pos1 = @strpos($data, "ä¸ª", $pos0);
 	$total = 0;
-	if ($pos > 12)
+	if ($pos0 > 0 && $pos1 > 0)
 	{
-		$pos2 = @strpos($data, "Æª", $pos);
-		$total = substr($data, $pos, $pos2 - $pos1);
-		$total = (int) str_replace(",", "", $total);
+		$str = substr($data, $pos0, $pos1 - $pos0);
+		$total = (int) str_replace(",", "", $str);
 	}
 	return $total;
 }
@@ -38,31 +35,31 @@ if ($word != '')
 {
 	if (get_magic_quotes_gpc()) $word = stripslashes($word);
 	$word = trim(strip_tags($word));
-	if (strlen($word) < 2) $warn_str = "ÇëÊäÈëÕıÈ·µÄ´Ê»ã";
-	else if (strlen($word) > 30) $warn_str = "ÊäÈëµÄ´ÊÓïÌ«³¤ÁË";
-	else if (strpos($word, ' ') !== false) $warn_str = "´Ê»ã²»Òª°üº¬¿Õ¸ñ";
+	if (strlen($word) < 2) $warn_str = "è¯·è¾“å…¥æ­£ç¡®çš„è¯æ±‡";
+	else if (strlen($word) > 30) $warn_str = "è¾“å…¥çš„è¯è¯­å¤ªé•¿äº†";
+	else if (strpos($word, ' ') !== false) $warn_str = "è¯æ±‡ä¸è¦åŒ…å«ç©ºæ ¼";
 	else if (preg_match('/[\x81-\xfe]/', $word) && preg_match('/[\x20-\x7f]{3}/', $word)) 
-		$warn_str = "ÖĞÓ¢»ìºÏÊ±×ÖÄ¸×î¶àÖ»ÄÜ³ö3¸öÒÔÏÂµÄÁ¬Ğø×ÖÄ¸";
+		$warn_str = "ä¸­è‹±æ··åˆæ—¶å­—æ¯æœ€å¤šåªèƒ½å‡º3ä¸ªä»¥ä¸‹çš„è¿ç»­å­—æ¯";
 	else
 	{
 		$count = get_count($word);
-		if ($count < 0) $warn_str = "ÄÚ²¿Ô­Òò£¬¼ÆËãÊ§°Ü£¡";
+		if ($count < 0) $warn_str = "å†…éƒ¨åŸå› ï¼Œè®¡ç®—å¤±è´¥ï¼";
 		else $res = get_tfidf($word, $count);
 	}
 }
 ?>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
-<title>ĞÂ´ÊÉú´ÊµÄTF/IDF¼ÆËãÆ÷ - for scws</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>æ–°è¯ç”Ÿè¯çš„TF/IDFè®¡ç®—å™¨ - for scws</title>
 <style>
 body { font-size: 14px; }
 pre { font-size: 12px; color: red; }
 </style>
 </head>
 <body>
-<h1>ĞÂ´ÊÉú´ÊµÄTF/IDF¼ÆËãÆ÷</h1>
-<p>´Ë¼ÆËãÆ÷µÄÒÀ¾İÊÇ²ÎÕÕ°Ù¶ÈËÑË÷½á¹ûÊıÁ¿¼ÓÒÔ¼ÆËã£¬¼ÆËã¹«Ê½½öÊÊÓÃÓÚ scws ·Ö´Ê£¬ÆäËüÓÃÍ¾ÔòÖ»ÄÜÓÃÓÚ²Î¿¼¡£</p>
+<h1>æ–°è¯ç”Ÿè¯çš„TF/IDFè®¡ç®—å™¨</h1>
+<p>æ­¤è®¡ç®—å™¨çš„ä¾æ®æ˜¯å‚ç…§ç™¾åº¦æœç´¢ç»“æœæ•°é‡åŠ ä»¥è®¡ç®—ï¼Œè®¡ç®—å…¬å¼ä»…é€‚ç”¨äº scws åˆ†è¯ï¼Œå…¶å®ƒç”¨é€”åˆ™åªèƒ½ç”¨äºå‚è€ƒã€‚</p>
 <form method="post">
 <input type="text" size="30" name="data" value="<?php echo htmlspecialchars($word); ?>" />
 <input type="submit">
@@ -70,9 +67,9 @@ pre { font-size: 12px; color: red; }
 <p>
 <?php
 if (!empty($word) && empty($warn_str)) 
-	printf("¼ÆËã½á¹û£ºWORD=%s TF=%.2f IDF=%.2f<br />\n", $word, $res[0], $res[1]);
+	printf("è®¡ç®—ç»“æœï¼šWORD=%s TF=%.2f IDF=%.2f<br />\n", $word, $res[0], $res[1]);
 if (!empty($warn_str))
-	printf("<font color=\"red\">´íÎó£º%s</font><br />\n", $warn_str);
+	printf("<font color=\"red\">é”™è¯¯ï¼š%s</font><br />\n", $warn_str);
 ?>
 </p>
 </body>
