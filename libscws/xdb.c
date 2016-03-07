@@ -57,8 +57,10 @@ static void _xdb_read_data(xdb_t x, void *buf, unsigned int off, int len)
 
 	if (x->fd >= 0)
 	{
-		lseek(x->fd, off, SEEK_SET);
-		read(x->fd, buf, len);
+		if (lseek(x->fd, off, SEEK_SET) == -1)
+			return;
+		if (read(x->fd, buf, len) != len)
+			return;
 	}
 	else
 	{
