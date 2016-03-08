@@ -34,6 +34,10 @@
 #include <sys/mman.h>
 #endif
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 static int _xdb_hasher(xdb_t x, const char *s, int len)
 {
 	unsigned int h = x->base;
@@ -135,11 +139,7 @@ xdb_t xdb_open(const char *fpath, int mode)
 		return NULL;
 
 	/* try to open & check the file */
-#ifdef WIN32
-	if ((x->fd = open(fpath, mode == 'w' ? O_RDWR|O_BINARY : O_RDONLY|O_BINARY)) < 0)
-#else //WIN32
-	if ((x->fd = open(fpath, mode == 'w' ? O_RDWR : O_RDONLY)) < 0)
-#endif //WIN32
+	if ((x->fd = open(fpath, mode == 'w' ? O_RDWR | O_BINARY : O_RDONLY | O_BINARY)) < 0)
 	{
 #ifdef DEBUG
 		perror("Failed to open the XDB file");
