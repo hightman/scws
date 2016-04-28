@@ -47,7 +47,7 @@ static void show_usage(int code, const char *msg)
 	printf("                   if the file suffix is .txt, it will be treated as plain text dict.\n");
 	printf("  -M <1~15>        use multi child words mode(中国人->中国+人+中国人)\n");
 	printf("                   1|2|4|8: short|duality|zmain|zall\n");
-	printf("  -I               ignore the all mark symbol such as ,:\n");
+	printf("  -I               ignore the all punctuation symbols such as ,:\n");
 	printf("  -A               show the word attribute\n");
 	printf("  -E               import the xdb dict into xtree(memory)\n");
 	printf("  -N               don't show time usage and warnings\n");
