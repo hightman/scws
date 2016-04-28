@@ -1,0 +1,5 @@
+make
+wget http://www.xunsearch.com/scws/down/scws-dict-chs-utf8.tar.bz2
+tar -xjf scws-dict-chs-utf8.tar.bz2
+./a.out -h (for help)
+./a.out -d ./dict.utf8.xdb -c utf8 -M 2 -I
