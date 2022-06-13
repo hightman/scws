@@ -64,12 +64,19 @@ typedef size_t	str_size_t;
 typedef int str_size_t;
 #endif
 
+/// hightman.20220613: for PHP8
+#ifndef TSRMLS_C
+#define TSRMLS_C
+#define TSRMLS_CC
+#define TSRMLS_D
+#endif
+
 /// ZEND_DECLARE_MODULE_GLOBALS(scws)
 
 static zend_class_entry *scws_class_entry_ptr;
 static int le_scws;
 
-#define PHP_SCWS_MODULE_VERSION		"0.2.3"
+#define PHP_SCWS_MODULE_VERSION		"0.2.4"
 #define	PHP_SCWS_DEFAULT_CHARSET	"gbk"
 #define	PHP_SCWS_OBJECT_TAG			"scws handler"
 #define	DELREF_SCWS(x)	{	\
@@ -215,7 +222,7 @@ static zend_function_entry php_scws_class_functions[] = {
 
 static ZEND_RSRC_DTOR_FUNC(php_scws_dtor)
 {
-#if PHP_MAJOR_VERSION == 7
+#if PHP_MAJOR_VERSION >= 7
 #define rsrc	res
 #endif
 	if (rsrc->ptr) {
@@ -227,7 +234,7 @@ static ZEND_RSRC_DTOR_FUNC(php_scws_dtor)
 		efree(ps);
 		rsrc->ptr = NULL;
 	}
-#if PHP_MAJOR_VERSION == 7
+#if PHP_MAJOR_VERSION >= 7
 #undef rsrc
 #endif
 }
