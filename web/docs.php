@@ -549,7 +549,6 @@ print_r($top);
    `bool SimpleCWS::set_rule(string rule_path)` 设定分词所用的新词识别规则集（用于人名、地名、数字时间年代等识别）。
 
    > **参数 rule_path** 规则集的路径，可以是相对路径或完全路径。（遵循安全模式下的 open_basedir）  
-   > **参数 mode** 可选，表示加载的方式。参见 `scws_add_dict`  
    > **返回值** 成功返回 true 失败返回 false
 
 8. `bool scws_set_ignore(resource scws_handle, bool yes)`  
@@ -616,8 +615,8 @@ print_r($top);
    > 这表示返回的词性必须在列表中，如果以~开头，则表示取反，词性必须不在列表中，若为空则返回全部词。  
    > **返回值** 成功返回符合要求词汇组成的数组，返回 false。返回的词汇包含的键值参见 `scws_get_result`
 
-15. `bool scws_has_words(resource scws_handle, string attr)`  
-    `mixed SimpleCWS::has_words(string attr)` 根据 send_text 设定的文本内容，返回系统中是否包括符合词性要求的关键词。
+15. `bool scws_has_word(resource scws_handle, string attr)`
+    `mixed SimpleCWS::has_word(string attr)` 根据 send_text 设定的文本内容，返回系统中是否包括符合词性要求的关键词。
 
    > **参数 attr** 是一系列词性组成的字符串，各词性之间以半角的逗号隔开，
    > 这表示返回的词性必须在列表中，如果以~开头，则表示取反，词性必须不在列表中，若为空则返回全部词。  
