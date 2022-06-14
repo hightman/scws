@@ -182,7 +182,10 @@ struct php_scws
 #endif
 };
 
-zend_function_entry scws_functions[] = {
+#if PHP_MAJOR_VERSION >= 8
+#include "scws_arginfo.h"
+#else
+zend_function_entry ext_functions[] = {
 	PHP_FE(scws_open, NULL)
 	PHP_FE(scws_new, NULL)
 	PHP_FE(scws_close, NULL)
@@ -202,7 +205,7 @@ zend_function_entry scws_functions[] = {
 	{NULL, NULL, NULL}
 };
 
-static zend_function_entry php_scws_class_functions[] = {
+static zend_function_entry class_SimpleCWS_methods[] = {
 	PHP_FALIAS(close,		scws_close,			NULL)
 	PHP_FALIAS(set_charset,	scws_set_charset,	NULL)
 	PHP_FALIAS(add_dict,	scws_add_dict,		NULL)
@@ -219,6 +222,7 @@ static zend_function_entry php_scws_class_functions[] = {
 	PHP_FALIAS(version,		scws_version,		NULL)
 	{NULL, NULL, NULL}
 };
+#endif /* PHP_MAJOR_VERSION >= 8 */
 
 static ZEND_RSRC_DTOR_FUNC(php_scws_dtor)
 {
@@ -244,7 +248,7 @@ zend_module_entry scws_module_entry = {
 	STANDARD_MODULE_HEADER,
 #endif
 	"scws",
-	scws_functions,
+	ext_functions,
 	PHP_MINIT(scws),
 	PHP_MSHUTDOWN(scws),
 	NULL,
@@ -273,7 +277,7 @@ PHP_MINIT_FUNCTION(scws)
 	REGISTER_INI_ENTRIES();
 
 	le_scws = zend_register_list_destructors_ex(php_scws_dtor, NULL, PHP_SCWS_OBJECT_TAG, module_number);
-	INIT_CLASS_ENTRY(scws_class_entry, "SimpleCWS", php_scws_class_functions);
+	INIT_CLASS_ENTRY(scws_class_entry, "SimpleCWS", class_SimpleCWS_methods);
 	scws_class_entry_ptr = zend_register_internal_class(&scws_class_entry TSRMLS_CC);
 
 	REGISTER_LONG_CONSTANT("SCWS_XDICT_XDB",	SCWS_XDICT_XDB, CONST_CS|CONST_PERSISTENT);
