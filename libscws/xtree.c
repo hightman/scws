@@ -34,10 +34,13 @@ static int _xtree_hasher(xtree_t xt, const char *s, int len)
 static node_t _xtree_node_search(node_t head, node_t **pnode, const char *key, int len)
 {
 	int cmp;	
-	
-	cmp = memcmp(key, head->key, len);
+
+	int hlen = strlen(head->key);
+	int clen = len < hlen ? len : hlen;
+
+	cmp = memcmp(key, head->key, clen);
 	if (cmp == 0)
-		cmp = len - strlen(head->key);
+		cmp = len - hlen;
 	
 	if (cmp != 0)	
 	{
