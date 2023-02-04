@@ -182,7 +182,7 @@ struct php_scws
 #endif
 };
 
-#if PHP_MAJOR_VERSION >= 8
+#if (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION > 0) || (PHP_MAJOR_VERSION > 8)
 #include "scws_arginfo.h"
 #else
 zend_function_entry ext_functions[] = {
