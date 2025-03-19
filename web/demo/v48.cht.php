@@ -66,7 +66,8 @@ $cws->set_charset('utf8');
 // use default dictionary & rules
 //
 $cws->set_rule(ini_get('scws.default.fpath') . '/rules_cht.utf8.ini');
-$cws->set_dict(ini_get('scws.default.fpath') . '/dict_cht.utf8.xdb');
+//$cws->set_dict(ini_get('scws.default.fpath') . '/dict_cht.utf8.xdb');
+$cws->set_dict('/data/www/xunsearch/scws-dict/dict_cht.utf8.xdb');
 
 $cws->set_ignore($ignore);
 $cws->send_text($mydata);

@@ -76,7 +76,8 @@ if (!isset($limit)) $limit = 10;
 $cws = scws_new();
 $cws->set_charset('gbk');
 $cws->set_rule(ini_get('scws.default.fpath') . '/rules.ini');
-$cws->set_dict(ini_get('scws.default.fpath') . '/dict.xdb');
+//$cws->set_dict(ini_get('scws.default.fpath') . '/dict.xdb');
+$cws->set_dict('/data/www/xunsearch/scws-dict/dict.xdb');
 
 //
 // use default dictionary & rules

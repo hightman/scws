@@ -34,7 +34,8 @@ elseif (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING']))
 // 
 require 'pscws4.class.php';
 $cws = new PSCWS4('gbk');
-$cws->set_dict(ini_get('scws.default.fpath') . '/dict.xdb');
+//$cws->set_dict(ini_get('scws.default.fpath') . '/dict.xdb');
+$cws->set_dict('/data/www/xunsearch/scws-dict/dict.xdb');
 $cws->set_rule('etc/rules.ini');
 //$cws->set_multi(3);
 //$cws->set_ignore(true);

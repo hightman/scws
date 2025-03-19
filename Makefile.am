@@ -21,7 +21,8 @@ dist-hook:
 #	-rm -f $(distdir)/libscws/version.h
 
 sync-web:
-	unison ./web ssh://xunsearch/web/scws $(UNISON_OPT)
+	#unison ./web ssh://xunsearch/web/scws $(UNISON_OPT)
+	rsync -avzp --delete ./web/* d10:/data/dockers/php-runner/www/xunsearch/web/scws
 
 dist-web: dist-bzip2
 	mv -f $(distdir).tar.bz2 web/down
