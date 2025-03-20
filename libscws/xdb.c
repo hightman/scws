@@ -6,11 +6,11 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
 #ifdef WIN32
-#	include "config_win32.h"
+#include "config_win32.h"
 #endif
 
 #include "xdb.h"
@@ -18,7 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #ifndef WIN32
-#	include <unistd.h>
+#include <sys/file.h>
+#include <unistd.h>
 #endif
 #include <string.h>
 #include <fcntl.h>
@@ -26,11 +27,15 @@
 #include <sys/types.h>
 
 #ifdef HAVE_FLOCK
-#   include <sys/file.h>
+#include <sys/file.h>
 #endif
 
 #ifdef HAVE_MMAP
-#   include <sys/mman.h>
+#include <sys/mman.h>
+#endif
+
+#ifndef O_BINARY
+#define O_BINARY 0
 #endif
 
 static int _xdb_hasher(xdb_t x, const char *s, int len)
@@ -57,8 +62,10 @@ static void _xdb_read_data(xdb_t x, void *buf, unsigned int off, int len)
 
 	if (x->fd >= 0)
 	{
-		lseek(x->fd, off, SEEK_SET);
-		read(x->fd, buf, len);
+		if (lseek(x->fd, off, SEEK_SET) == -1)
+			return;
+		if (read(x->fd, buf, len) != len)
+			return;
 	}
 	else
 	{
@@ -132,7 +139,7 @@ xdb_t xdb_open(const char *fpath, int mode)
 		return NULL;
 
 	/* try to open & check the file */
-	if ((x->fd = open(fpath, mode == 'w' ? O_RDWR : O_RDONLY)) < 0)
+	if ((x->fd = open(fpath, mode == 'w' ? O_RDWR | O_BINARY : O_RDONLY | O_BINARY)) < 0)
 	{
 #ifdef DEBUG
 		perror("Failed to open the XDB file");
